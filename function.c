@@ -189,3 +189,84 @@ void depositReal(int userId) {
       fclose(file);
   }
 }
+
+//INSTRUMENTOS 
+void buyInstrument(User *user) {
+    float* Saldo = &user->balanceReal;
+
+    //INSTRUMENTOS Á VENDA NA LOJA
+    Instrument instruments[] = {
+        {"Violao", 800.0},
+        {"Guitarra", 1000.0},
+        {"Piano", 1500.0},
+        {"Bateria", 800.0},
+        {"Flauta", 200.0},
+        {"Violino", 1300.0},
+        {"Cavaquinho", 600.0},
+        {"Pandero", 300.0},
+        
+    };
+    printf("Saldo Atual: R$%.2f\n", *Saldo);
+    int numInstruments = sizeof(instruments) / sizeof(instruments[0]);
+
+    printf("INSTRUMENTOS A VENDA:\n");
+    for (int i = 0; i < numInstruments; i++) {
+        printf("%d - %s - R$ %.2f\n", i + 1, instruments[i].name, instruments[i].price);
+    }
+
+    int choice;
+    printf("Escolha seu instrumento (ou 0 para cancelar): ");
+    diviser();
+    scanf("%d", &choice);
+    //CANCELA COMPRA
+    if (choice == 0) {
+        return; 
+    }
+
+    if (choice < 1 || choice > numInstruments) {
+        printf("Escolha invalida!\n");
+        return;
+    }
+
+    Instrument selectedInstrument = instruments[choice - 1];
+
+    diviser();
+
+    //MOVIMENTAÇÕES NO SALDO
+    if (user->balanceReal >= selectedInstrument.price) {
+        user->balanceReal -= selectedInstrument.price;
+        //MOSTRA SUA COMPRA
+        printf("Voce comprou %s por R$ %.2f!\n", selectedInstrument.name, selectedInstrument.price);
+        //MOSTRA NOVO
+        printf("Saldo restante: R$ %.2f\n", user->balanceReal);
+        diviser();
+        //ATUALIZA O SALDO
+        FILE *file = fopen("users.dat", "r+b"); 
+        if (file == NULL) {
+            printf("Erro.\n");
+            return;
+        }
+
+        User tempUser;
+        int found = 0;
+
+        //LOCALIZA USUARIO
+        while (fread(&tempUser, sizeof(User), 1, file) == 1) {
+            if (tempUser.id == user->id) { 
+                found = 1;
+                fseek(file, -sizeof(User), SEEK_CUR); 
+                fwrite(user, sizeof(User), 1, file);
+                break;
+            }
+        }
+        if (found) {
+            printf("");
+        } else {
+            printf("Usuário não encontrado.\n");
+        }
+
+        fclose(file);
+    } else {
+        printf("Saldo insuficiente para comprar %s. Saldo atual: R$ %.2f\n", selectedInstrument.name, user->balanceReal);
+    }
+}

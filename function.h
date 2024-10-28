@@ -10,6 +10,14 @@ typedef struct {
     float balanceReal;
 } User;
 
+//INSTRUMENTOS E LIMPEZA
+typedef struct {
+    char name[50];
+    float price;
+} Instrument;
+
+void buyInstrument(User *user);
+
 //FUNCOES DE INTERFACE
 void diviser();
 void welcome();

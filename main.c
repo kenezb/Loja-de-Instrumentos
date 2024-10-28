@@ -20,8 +20,7 @@ int main() {
                 depositReal(user.id);
                 break;
             case 2:
-                diviser();
-                printf("\nComprar Instrumento\n");
+                buyInstrument(&user);
                 break;
             case 3:
                 diviser();
