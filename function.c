@@ -137,3 +137,55 @@ void registerUser(User *user) {
     printf("\nUsuario Registrado e Logado!\n");
     diviser();
 }
+
+//FUNCAO CARTEIRA
+void depositReal(int userId) {
+  User user;
+  int found = 0;
+  float amount = 0;
+  
+  FILE *file = fopen("users.dat", "r+b"); 
+  if (file == NULL) {
+      printf("Erro ao verificar saldo\n");
+      return;
+  }
+
+  while (fread(&user, sizeof(User), 1, file) == 1) {
+      if (user.id == userId) { 
+          found = 1;
+          break;
+      }
+  }
+  if (!found) {
+      printf("Usuario nao encontrado.\n");
+      fclose(file);
+      return;
+  }
+  diviser();
+  printf("Saldo Atual: R$%.2f\n", user.balanceReal);
+  
+  
+  printf("\nQual valor do deposito? | Digite 0 para cancelar.\n");
+  diviser();
+  printf("R$ ");
+  scanf("%f", &amount);
+  diviser();
+  
+  if (amount == 0){
+    return;
+  }
+  if (amount < 0) {
+      printf("Seu deposito nao pode menor ou igual a zero.\n");
+      fclose(file);
+      depositReal(userId); 
+  } else {
+      user.balanceReal += amount;
+      //REESCREVE NO ARQUIVO
+      fseek(file, -sizeof(User), SEEK_CUR);
+      fwrite(&user, sizeof(User), 1, file);
+      printf("Saldo Atualizado: R$ %.2f\n", user.balanceReal);
+      diviser();
+      
+      fclose(file);
+  }
+}

@@ -17,8 +17,7 @@ int main() {
 
         switch (option) {
             case 1:
-                diviser();
-                printf("\nCarteira | Deposito\n");
+                depositReal(user.id);
                 break;
             case 2:
                 diviser();
