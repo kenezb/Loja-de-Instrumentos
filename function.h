@@ -20,4 +20,6 @@ void loginOrRegister(User *user);
 void loginUser(User *user);
 void registerUser(User *user);
 
+//FUNCAO CARTEIRA 
+void depositReal(int userId);
 #endif
