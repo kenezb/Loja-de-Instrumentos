@@ -23,11 +23,10 @@ int main() {
                 buyInstrument(&user);
                 break;
             case 3:
-                diviser();
-                printf("\nLimpeza de Instrumento\n");
+                cleanInstrument(&user);
                 break;
             case 4:
-                printf("\nSair\n");
+                printf("Encerrando Sessao...\n");
                 break;
             default:
                 diviser();

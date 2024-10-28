@@ -3,7 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-//FUNCOES DE INTERFACE
+
+void diviser() { printf("------------------------------\n"); }
+
 void menu(int userId){
   printf("\nEscolha uma opcao:\n");
   diviser();
@@ -14,35 +16,12 @@ void menu(int userId){
   diviser();
 }
 
-void diviser() { printf("------------------------------\n"); }
-
 void welcome() {
   printf("INSTRUMENTOS\n");
   diviser();
   printf("A Melhor loja para o seu instrumento!\n");
 }
 
-void loginOrRegister(User *user) {
-  int option = 0;
-  printf("Faca LOGIN ou CADASTRO:\n");
-  printf("1 - CADASTRO\n");
-  printf("2 - LOGIN\n");
-  diviser();
-  printf("Digite sua escolha: ");
-  scanf("%i", &option);
-  if (option == 1)
-    registerUser(user);
-  else if (option == 2)
-    loginUser(user);
-  else {
-    diviser();
-    printf("\nOpcao invalida\n");
-    diviser();
-    loginOrRegister(user);
-  }
-}
-
-//LOGIN OU REGISTRO
 void loginUser(User *user) {
   char cpf[12];
   char password[6];
@@ -62,7 +41,7 @@ void loginUser(User *user) {
     printf("Erro.\n");
     return;
   }
-  // PROCURA UM USUÁRIO COM O CPF E SENHA 
+// PROCURA UM USUÁRIO COM O CPF E SENHA 
   while (fread(&tempUser, sizeof(User), 1, file) == 1) {
           if (strcmp(tempUser.cpf, cpf) == 0 && strcmp(tempUser.password, password) == 0) {
               *user = tempUser; 
@@ -138,7 +117,26 @@ void registerUser(User *user) {
     diviser();
 }
 
-//FUNCAO CARTEIRA
+void loginOrRegister(User *user) {
+  int option = 0;
+  printf("Faca LOGIN ou CADASTRO:\n");
+  printf("1 - CADASTRO\n");
+  printf("2 - LOGIN\n");
+  diviser();
+  printf("Digite sua escolha: ");
+  scanf("%i", &option);
+  if (option == 1)
+    registerUser(user);
+  else if (option == 2)
+    loginUser(user);
+  else {
+    diviser();
+    printf("\nOpcao invalida\n");
+    diviser();
+    loginOrRegister(user);
+  }
+}
+
 void depositReal(int userId) {
   User user;
   int found = 0;
@@ -190,7 +188,6 @@ void depositReal(int userId) {
   }
 }
 
-//INSTRUMENTOS 
 void buyInstrument(User *user) {
     float* Saldo = &user->balanceReal;
 
@@ -270,3 +267,88 @@ void buyInstrument(User *user) {
         printf("Saldo insuficiente para comprar %s. Saldo atual: R$ %.2f\n", selectedInstrument.name, user->balanceReal);
     }
 }
+
+void cleanInstrument(User *user) {
+    float* Saldo = &user->balanceReal;
+
+    //PREÇO PARA LIMPEZA
+    Instrument instruments[] = {
+        {"Violao", 80.0},
+        {"Guitarra", 100.0},
+        {"Piano", 150.0},
+        {"Bateria", 80.0},
+        {"Flauta", 20.0},
+        {"Violino", 130.0},
+        {"Cavaquinho", 60.0},
+        {"Pandero", 30.0},
+        
+    };
+    printf("Saldo Atual: R$%.2f\n", *Saldo);
+    int numInstruments = sizeof(instruments) / sizeof(instruments[0]);
+
+    printf("PRECOS DA LIMPEZA:\n");
+    for (int i = 0; i < numInstruments; i++) {
+        printf("%d - %s - R$ %.2f\n", i + 1, instruments[i].name, instruments[i].price);
+    }
+
+    int choice;
+    printf("Escolha seu instrumento a limpar (ou 0 para cancelar): ");
+    diviser();
+    scanf("%d", &choice);
+    //CANCELA COMPRA DE LIMPEZA
+    if (choice == 0) {
+        return; 
+    }
+
+    if (choice < 1 || choice > numInstruments) {
+        printf("Escolha invalida!\n");
+        return;
+    }
+
+    Instrument selectedInstrument = instruments[choice - 1];
+
+    diviser();
+
+    //MOVIMENTAÇÕES NO SALDO
+    if (user->balanceReal >= selectedInstrument.price) {
+        user->balanceReal -= selectedInstrument.price;
+        //MOSTRA SUA COMPRA
+        printf("Voce comprou %s por R$ %.2f!\n", selectedInstrument.name, selectedInstrument.price);
+        //MOSTRA NOVO
+        printf("Saldo restante: R$ %.2f\n", user->balanceReal);
+        diviser();
+        //ATUALIZA O SALDO
+        FILE *file = fopen("users.dat", "r+b"); 
+        if (file == NULL) {
+            printf("Erro.\n");
+            return;
+        }
+
+        User tempUser;
+        int found = 0;
+
+        //LOCALIZA USUARIO
+        while (fread(&tempUser, sizeof(User), 1, file) == 1) {
+            if (tempUser.id == user->id) { 
+                found = 1;
+                fseek(file, -sizeof(User), SEEK_CUR); 
+                fwrite(user, sizeof(User), 1, file);
+                break;
+            }
+        }
+        if (found) {
+            printf("");
+        } else {
+            printf("Usuario não encontrado.\n");
+        }
+
+        fclose(file);
+    } else {
+        printf("Saldo insuficiente para limpar seu instrumento %s. Saldo atual: R$ %.2f\n", selectedInstrument.name, user->balanceReal);
+    }
+}
+
+
+
+
+

@@ -2,7 +2,8 @@
 #define FUNCTION_H
 #include <stdio.h>
 
-//DADOS USUARIO 
+
+//DADOS DO USUÁRIO
 typedef struct {
     int id;
     char cpf[12];
@@ -16,18 +17,24 @@ typedef struct {
     float price;
 } Instrument;
 
-void buyInstrument(User *user);
 
-//FUNCOES DE INTERFACE
+void buyInstrument(User *user);
+void cleanInstrument(User *user);
+
+
+
+//FUNCOES INTERFACE
 void diviser();
 void welcome();
-void menu(int userId);
 void loginOrRegister(User *user);
+void menu(int userId);
 
-//FUNCOES LOGIN E REGISTRO
+//FUNCOES REGISTRO E LOGIN
 void loginUser(User *user);
 void registerUser(User *user);
 
 //FUNCAO CARTEIRA 
 void depositReal(int userId);
+
+
 #endif
