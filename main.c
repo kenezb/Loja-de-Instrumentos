@@ -24,6 +24,15 @@ int main() {
             case 3:
                 removeInstrument();
                 break;
+            case 4:
+                listUsers();
+                break;
+            case 5:
+                resetUserInfo(user.cpf);
+                break;
+            case 6:
+                deleteAllInstruments();
+                break;
             case 9:
                 printf("Encerrando Sessao...\n");
                 break;

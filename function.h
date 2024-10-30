@@ -1,4 +1,3 @@
-
 #ifndef FUNCTION_H
 #define FUNCTION_H
 #include <stdio.h>
@@ -39,5 +38,8 @@ void depositReal(int userId);
 void addInstrument();
 void addCleaningPrice();
 void removeInstrument();
+void listUsers();
+void resetUserInfo(char *currentCpf); 
+void deleteAllInstruments(); 
 
 #endif

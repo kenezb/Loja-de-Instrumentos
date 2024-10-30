@@ -11,6 +11,9 @@ void adminMenu() {
     printf("1 - Adicionar Instrumento\n");
     printf("2 - Adicionar Preco de Limpeza\n");
     printf("3 - Remover Instrumento\n");
+    printf("4 - Listar Usuarios\n");
+    printf("5 - Remover Todos os Usuarios\n");
+    printf("6 - Remover Todos os Intrumentos\n");
     printf("\n");
     printf("9 - Sair\n");
     diviser();
@@ -78,6 +81,8 @@ void loginUser(User *user) {
     }
 }
 
+
+
 void registerUser(User *user) {
     FILE *file = fopen("users.dat", "rb");
     if (!file) {
@@ -134,6 +139,7 @@ void registerUser(User *user) {
     printf("\nUsuario Registrado e Logado!\n");
     diviser();
 }
+
 
 void loginOrRegister(User *user) {
   int option = 0;
@@ -439,3 +445,62 @@ void removeInstrument() {
     }
 }
 
+void listUsers() {
+    FILE *file = fopen("users.dat", "rb"); 
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de Usuarios.\n");
+        return;
+    }
+
+    printf("Lista de Usuarios:\n");
+    printf("---------------------------------\n");
+
+    User user;
+    int userCount = 0;
+
+    while (fread(&user, sizeof(User), 1, file) == 1) {
+        printf("CPF: %s\n", user.cpf);
+        printf("Tipo de Usuario: %s\n", user.userType ? "Administrador" : "Usuario Comum");
+        printf("---------------------------------\n");
+        userCount++;
+    }
+
+    if (userCount == 0) {
+        printf("Nenhum Usuario encontrado.\n");
+    }
+
+    fclose(file);
+}
+
+void resetUserInfo(char *currentCpf) {
+    FILE *file = fopen("users.dat", "rb+"); 
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de usuários.\n");
+        return;
+    }
+
+    User user;
+    while (fread(&user, sizeof(User), 1, file) == 1) {
+    
+        if (strcmp(user.cpf, currentCpf) != 0) {
+            memset(&user, 0, sizeof(User));
+            fseek(file, -sizeof(User), SEEK_CUR);
+            fwrite(&user, sizeof(User), 1, file);
+        }
+    }
+
+    fclose(file);
+    printf("Informações de usuários (exceto do usuário atual) foram zeradas.\n");
+}
+
+// Função para apagar todos os dados dos instrumentos
+void deleteAllInstruments() {
+    FILE *file = fopen("instruments.dat", "wb");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de instrumentos.\n");
+        return;
+    }
+
+    fclose(file);
+    printf("Todos os dados dos instrumentos foram apagados.\n");
+}
