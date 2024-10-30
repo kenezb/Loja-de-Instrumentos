@@ -18,6 +18,12 @@ int main() {
             case 1:
                 addInstrument();
                 break;
+            case 2:
+                addCleaningPrice();
+                break;
+            case 3:
+                removeInstrument();
+                break;
             case 9:
                 printf("Encerrando Sessao...\n");
                 break;

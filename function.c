@@ -9,6 +9,8 @@ void adminMenu() {
     printf("\nMenu do Administrador:\n");
     diviser();
     printf("1 - Adicionar Instrumento\n");
+    printf("2 - Adicionar Preco de Limpeza\n");
+    printf("3 - Remover Instrumento\n");
     printf("\n");
     printf("9 - Sair\n");
     diviser();
@@ -393,5 +395,47 @@ void cleanInstrument(User *user) {
 
 void addCleaningPrice() {
     printf("Adicionar preco de limpeza (Funcionalidade a ser implementada)\n");
+}
+
+void removeInstrument() {
+    char name[50];
+    printf("Digite o nome do instrumento que deseja remover: ");
+    scanf("%49s", name);
+
+    FILE *file = fopen("instruments.dat", "rb");
+    if (!file) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    Instrument tempInstruments[100]; 
+    int count = 0;
+
+    while (fread(&tempInstruments[count], sizeof(Instrument), 1, file) == 1) {
+        count++;
+    }
+    fclose(file);
+
+    file = fopen("instruments.dat", "wb");
+    if (!file) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    int removed = 0;
+    for (int i = 0; i < count; i++) {
+        if (strcmp(tempInstruments[i].name, name) != 0) {
+            fwrite(&tempInstruments[i], sizeof(Instrument), 1, file);
+        } else {
+            removed = 1;
+        }
+    }
+    fclose(file);
+
+    if (removed) {
+        printf("Instrumento removido com sucesso!\n");
+    } else {
+        printf("Instrumento não encontrado!\n");
+    }
 }
 
