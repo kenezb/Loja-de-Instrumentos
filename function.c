@@ -3,19 +3,27 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 void diviser() { printf("------------------------------\n"); }
 
-void menu(int userId){
-  printf("\nEscolha uma opcao:\n");
-  diviser();
-  printf("1 - Carteira | Deposito\n");
-  printf("2 - Comprar instrumento\n");
-  printf("3 - Limpeza de instrumento\n");
-  printf("4 - Sair\n");
-  diviser();
+void adminMenu() {
+    printf("\nMenu do Administrador:\n");
+    diviser();
+    printf("1 - Adicionar Instrumento\n");
+    printf("\n");
+    printf("9 - Sair\n");
+    diviser();
 }
 
+void userMenu() {
+    printf("\nMenu do Usuario:\n");
+    diviser();
+    printf("1 - Carteira | Deposito\n");
+    printf("2 - Comprar instrumento\n");
+    printf("3 - Limpeza de instrumento\n");
+    printf("\n");
+    printf("9 - Sair\n");
+    diviser();
+}
 void welcome() {
   printf("INSTRUMENTOS\n");
   diviser();
@@ -23,53 +31,57 @@ void welcome() {
 }
 
 void loginUser(User *user) {
-  char cpf[12];
-  char password[6];
-  int isUser = 0;
-  User tempUser;
+    char cpf[12];
+    char password[6];
+    int isUser = 0;
+    User tempUser;
 
-  printf("\nLOGIN\n");
-  diviser();
-  printf("Digite seu CPF (apenas numeros): ");
-  scanf("%11s", cpf);
+    printf("\nLOGIN\n");
+    diviser();
+    printf("Digite seu CPF (apenas numeros): ");
+    scanf("%11s", cpf);
 
-  printf("Digite sua senha (maximo 5 digitos): ");
-  scanf("%5s", password);
+    printf("Digite sua senha (maximo 5 digitos): ");
+    scanf("%5s", password);
 
-  FILE *file = fopen("users.dat", "rb");
-  if (!file) {
-    printf("Erro.\n");
-    return;
-  }
-// PROCURA UM USUÁRIO COM O CPF E SENHA 
-  while (fread(&tempUser, sizeof(User), 1, file) == 1) {
-          if (strcmp(tempUser.cpf, cpf) == 0 && strcmp(tempUser.password, password) == 0) {
-              *user = tempUser; 
-              isUser = 1;
-              break;
-          }
-      }
+    FILE *file = fopen("users.dat", "rb");
+    if (!file) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
 
-      fclose(file);
+    while (fread(&tempUser, sizeof(User), 1, file) == 1) {
+        if (strcmp(tempUser.cpf, cpf) == 0 && strcmp(tempUser.password, password) == 0) {
+            *user = tempUser;
+            isUser = 1;
+            break;
+        }
+    }
 
-      if (isUser) {
-          diviser();
-          printf("Bem Vindo!\n");
-          diviser();
-      } else {
-          diviser();
-          printf("CPF ou Senha incorretos.\n");
-          diviser();
-          loginOrRegister(user);
-      }
+    fclose(file);
+
+    if (isUser) {
+        diviser();
+        if (user->userType == 1) {
+            printf("Bem-vindo, Administrador!\n");
+        } else {
+            printf("Bem-vindo, Usuario!\n");
+        }
+        diviser();
+    } else {
+        diviser();
+        printf("CPF ou Senha incorretos.\n");
+        diviser();
+        loginOrRegister(user);
+    }
 }
 
 void registerUser(User *user) {
-    FILE *file = fopen("users.dat", "rb"); 
+    FILE *file = fopen("users.dat", "rb");
     if (!file) {
         file = fopen("users.dat", "wb");  
         if (!file) {
-            printf("Erro.\n");
+            printf("Erro ao abrir o arquivo.\n");
             return;
         }
     }
@@ -83,30 +95,34 @@ void registerUser(User *user) {
     fclose(file);
 
     user->id = 1; 
-    file = fopen("users.dat", "rb");  
+    file = fopen("users.dat", "rb");
     if (file != NULL) {
         while (fread(&tempUser, sizeof(User), 1, file) == 1) {
             if (tempUser.id >= user->id) {
-                user->id = tempUser.id + 1; 
+                user->id = tempUser.id + 1;
             }
         }
         fclose(file);
     }
 
-  
     printf("\nCADASTRO\n");
     diviser();
     printf("Digite seu CPF (apenas numeros): ");
-    scanf("%11s", user->cpf);  
+    scanf("%11s", user->cpf);
 
-    printf("Digite sua senha (maximo 5 digitos): ");
-    scanf("%5s", user->password);  
+    printf("Digite sua senha (maximo 5 digitos):");
+    scanf("%5s", user->password);
+
+    printf("\nDigite o tipo de usuario\n");
+    diviser();
+    printf("0 para comum\n1 para administrador\n");
+    scanf("%d", &user->userType);
 
     user->balanceReal = 0.0;
-  
+
     file = fopen("users.dat", "ab");
     if (!file) {
-        printf("Erro.\n");
+        printf("Erro ao abrir o arquivo.\n");
         return;
     }
 
@@ -191,20 +207,26 @@ void depositReal(int userId) {
 void buyInstrument(User *user) {
     float* Saldo = &user->balanceReal;
 
-    //INSTRUMENTOS Á VENDA NA LOJA
-    Instrument instruments[] = {
-        {"Violao", 800.0},
-        {"Guitarra", 1000.0},
-        {"Piano", 1500.0},
-        {"Bateria", 800.0},
-        {"Flauta", 200.0},
-        {"Violino", 1300.0},
-        {"Cavaquinho", 600.0},
-        {"Pandero", 300.0},
-        
-    };
+    Instrument instruments[100];
+    int numInstruments = 0;
+
+    FILE *file = fopen("instruments.dat", "rb");
+    if (!file) {
+        printf("Erro ao abrir o arquivo de instrumentos.\n");
+        return;
+    }
+
+    while (fread(&instruments[numInstruments], sizeof(Instrument), 1, file) == 1) {
+        numInstruments++;
+    }
+    fclose(file);
+
     printf("Saldo Atual: R$%.2f\n", *Saldo);
-    int numInstruments = sizeof(instruments) / sizeof(instruments[0]);
+
+    if (numInstruments == 0) {
+        printf("Não há instrumentos disponíveis para venda.\n");
+        return;
+    }
 
     printf("INSTRUMENTOS A VENDA:\n");
     for (int i = 0; i < numInstruments; i++) {
@@ -212,16 +234,17 @@ void buyInstrument(User *user) {
     }
 
     int choice;
-    printf("Escolha seu instrumento (ou 0 para cancelar): ");
+    printf("Escolha seu instrumento (ou 0 para cancelar):\n");
     diviser();
     scanf("%d", &choice);
-    //CANCELA COMPRA
+
+    // CANCELA COMPRA
     if (choice == 0) {
         return; 
     }
 
     if (choice < 1 || choice > numInstruments) {
-        printf("Escolha invalida!\n");
+        printf("Escolha inválida!\n");
         return;
     }
 
@@ -229,25 +252,26 @@ void buyInstrument(User *user) {
 
     diviser();
 
-    //MOVIMENTAÇÕES NO SALDO
+    // MOVIMENTAÇÕES NO SALDO
     if (user->balanceReal >= selectedInstrument.price) {
         user->balanceReal -= selectedInstrument.price;
-        //MOSTRA SUA COMPRA
-        printf("Voce comprou %s por R$ %.2f!\n", selectedInstrument.name, selectedInstrument.price);
-        //MOSTRA NOVO
+
+        // MOSTRA SUA COMPRA
+        printf("Você comprou %s por R$ %.2f!\n", selectedInstrument.name, selectedInstrument.price);
+        // MOSTRA NOVO SALDO
         printf("Saldo restante: R$ %.2f\n", user->balanceReal);
         diviser();
-        //ATUALIZA O SALDO
-        FILE *file = fopen("users.dat", "r+b"); 
+        // ATUALIZA O SALDO
+        file = fopen("users.dat", "r+b"); 
         if (file == NULL) {
-            printf("Erro.\n");
+            printf("Erro ao abrir o arquivo de Usuarios.\n");
             return;
         }
 
         User tempUser;
         int found = 0;
 
-        //LOCALIZA USUARIO
+        // LOCALIZA Usuario
         while (fread(&tempUser, sizeof(User), 1, file) == 1) {
             if (tempUser.id == user->id) { 
                 found = 1;
@@ -257,21 +281,40 @@ void buyInstrument(User *user) {
             }
         }
         if (found) {
-            printf("");
+            printf("Saldo atualizado com sucesso!\n");
         } else {
-            printf("Usuário não encontrado.\n");
+            printf("Usuario não encontrado.\n");
         }
 
         fclose(file);
     } else {
-        printf("Saldo insuficiente para comprar %s. Saldo atual: R$ %.2f\n", selectedInstrument.name, user->balanceReal);
+        printf("Saldo insuficiente para comprar %s.\nSaldo atual: R$ %.2f\n", selectedInstrument.name, user->balanceReal);
     }
+}
+void addInstrument() {
+    Instrument newInstrument;
+    printf("Digite o nome do instrumento: ");
+    scanf("%49s", newInstrument.name);  // Limite de 49 caracteres + '\0'
+    
+    printf("Digite o preço do instrumento: ");
+    scanf("%f", &newInstrument.price);
+
+    // Adiciona o instrumento ao arquivo
+    FILE *file = fopen("instruments.dat", "ab"); // Abre para adicionar no final
+    if (!file) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    fwrite(&newInstrument, sizeof(Instrument), 1, file);
+    fclose(file);
+
+    printf("Instrumento adicionado com sucesso!\n");
 }
 
 void cleanInstrument(User *user) {
     float* Saldo = &user->balanceReal;
 
-    //PREÇO PARA LIMPEZA
     Instrument instruments[] = {
         {"Violao", 80.0},
         {"Guitarra", 100.0},
@@ -348,7 +391,7 @@ void cleanInstrument(User *user) {
     }
 }
 
-
-
-
+void addCleaningPrice() {
+    printf("Adicionar preco de limpeza (Funcionalidade a ser implementada)\n");
+}
 

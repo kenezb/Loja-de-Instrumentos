@@ -2,39 +2,38 @@
 #define FUNCTION_H
 #include <stdio.h>
 
-
-//DADOS DO USUÁRIO
+// DADOS DO USUÁRIO
 typedef struct {
     int id;
     char cpf[12];
     char password[6];
     float balanceReal;
+    int userType; 
 } User;
 
-//INSTRUMENTOS E LIMPEZA
+// INSTRUMENTOS E LIMPEZA
 typedef struct {
     char name[50];
     float price;
 } Instrument;
 
-
 void buyInstrument(User *user);
 void cleanInstrument(User *user);
 
-
-
-//FUNCOES INTERFACE
+// FUNÇÕES INTERFACE
 void diviser();
 void welcome();
 void loginOrRegister(User *user);
-void menu(int userId);
+void userMenu();
+void adminMenu(); 
 
-//FUNCOES REGISTRO E LOGIN
+// FUNÇÕES REGISTRO E LOGIN
 void loginUser(User *user);
 void registerUser(User *user);
 
-//FUNCAO CARTEIRA 
+// FUNÇÃO CARTEIRA 
 void depositReal(int userId);
 
-
+// FUNÇÕES ADMINISTRATIVAS
+void addInstrument();
 #endif

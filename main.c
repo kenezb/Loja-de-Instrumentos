@@ -7,34 +7,50 @@ int main() {
     User user;
     welcome();
     diviser();
-    //ESCOLHA CADASTRO OU LOGIN
     loginOrRegister(&user);
-    //MENU
+
     int option;
     do {
-        menu(user.id);  
-        scanf("%i", &option);
-
-        switch (option) {
+        if (user.userType == 1) {
+            adminMenu();
+            scanf("%i", &option);
+           switch (option) {
             case 1:
-                depositReal(user.id);
+                addInstrument();
                 break;
-            case 2:
-                buyInstrument(&user);
-                break;
-            case 3:
-                cleanInstrument(&user);
-                break;
-            case 4:
+            case 9:
                 printf("Encerrando Sessao...\n");
                 break;
             default:
                 diviser();
-                printf("Opcaoo invalida. Tente novamente.\n");
+                printf("Opcao invalida. Tente novamente.\n");
                 diviser();
                 break;
+                }
+        } else { 
+            userMenu();
+            scanf("%i", &option);
+            switch (option) {
+                case 1:
+                    depositReal(user.id);
+                    break;
+                case 2:
+                    buyInstrument(&user);
+                    break;
+                case 3:
+                    cleanInstrument(&user);
+                    break;
+                case 9:
+                    printf("Encerrando Sessao...\n");
+                    break; 
+                default:
+                    diviser();
+                    printf("Opcao invalida. Tente novamente.\n");
+                    diviser();
+                    break;
+            }
         }
-    } while (option != 4);
+    } while (option != 9 && option != 10); 
 
     return 0;
 }
